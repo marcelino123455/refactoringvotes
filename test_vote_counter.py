@@ -38,6 +38,23 @@ class TestVoteCounter(unittest.TestCase):
         mock_print.assert_any_call("Alice: 2000 votes")
         mock_print.assert_any_call("winner is Bob")
         self.assertEqual(mock_print.call_count, 3)
+    
+    @patch("builtins.print")
+    def test_count_votes_tie(self, mock_print):
+        # Simulate a CSV file with invalid votes data
+        mock_csv = """city,candidate,votes
+        Springfield,Bob,100
+        Shelbyville,Alice,100
+        Springfield,Alice,100
+        Shelbyville,Bob,100"""
+        with patch("builtins.open", mock_open(read_data=mock_csv)):
+            count_votes("votes.csv")
+
+        # Expect show message tie  and me need to make new elections
+        mock_print.assert_any_call("Bob: 200 votes")
+        mock_print.assert_any_call("Alice: 200 votes")
+        mock_print.assert_any_call("Tie between Bob and Alice")
+        self.assertEqual(mock_print.call_count, 3)
 
 if __name__ == "__main__":
     unittest.main()
